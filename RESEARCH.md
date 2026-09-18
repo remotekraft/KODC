@@ -26,7 +26,7 @@ Both were downloaded and visually inspected. The listing does not state a reuse 
 
 ## September 19 motion update
 
-- `dist/assets/dance-loop.gif`: unmodified `Dancing Girl Files/Preview/all.gif` from [Dancing Girl Sprites by Luis Zuno / Ansimuz](https://opengameart.org/content/dancing-girl-sprites), [download archive](https://opengameart.org/sites/default/files/dancing_girl_files.zip). CC0; embedded licence permits commercial reuse and redistribution. Eight frames, 361 × 263 pixels. Visible credit provided even though not required.
+- `dist/assets/dance-loop.gif`: unmodified `Dancing Girl Files/Preview/all.gif` from [Dancing Girl Sprites by Luis Zuno / Ansimuz](https://opengameart.org/content/dancing-girl-sprites), [download archive](https://opengameart.org/sites/default/files/dancing_girl_files.zip). CC0; embedded licence permits commercial reuse and redistribution. Eight frames, 361 × 263 pixels. Attribution is retained here; the optional visible credit link was removed at the client's request.
 - `dist/assets/dance-art.png`: original fictional-adult illustration generated once using the built-in image generator and visually inspected; transparent PNG, 1254 × 1254. Not a photograph of KODC clients. Animated using CSS, not presented as a GIF.
 
 Final generation prompt:
