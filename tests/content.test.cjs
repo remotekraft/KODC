@@ -34,4 +34,6 @@ for (const entry of ['index.html','admin.html']) {
   assert.ok(html.includes('assets/logo.jpeg'),'Missing logo/favicon');
 }
 JSON.parse(readFileSync('dist/index.html','utf8').match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1]);
+assert.ok(readFileSync('.github/workflows/pages.yml','utf8').includes('path: dist'),'Pages must publish dist, not the repository root');
+assert.ok(!existsSync('.github/workflows/static.yml'),'Duplicate Pages workflow would overwrite the site');
 console.log('Content validation, URL safety, escaping, draft persistence, and failure checks passed.');

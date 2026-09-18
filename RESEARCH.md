@@ -23,3 +23,14 @@ Studio photos originate from [the exact KODC New Alipore listing on Magicpin](ht
 - `dist/assets/yoga-studio.webp`: https://img.magicpin.com/9137208_store_images_1.webp — group yoga class.
 
 Both were downloaded and visually inspected. The listing does not state a reuse licence or establish that they were uploaded by the owner. Obtain client/rights-holder approval and participant permissions before public launch. No stock/generated image is represented as the client or an instructor.
+
+## September 19 motion update
+
+- `dist/assets/dance-loop.gif`: unmodified `Dancing Girl Files/Preview/all.gif` from [Dancing Girl Sprites by Luis Zuno / Ansimuz](https://opengameart.org/content/dancing-girl-sprites), [download archive](https://opengameart.org/sites/default/files/dancing_girl_files.zip). CC0; embedded licence permits commercial reuse and redistribution. Eight frames, 361 × 263 pixels. Visible credit provided even though not required.
+- `dist/assets/dance-art.png`: original fictional-adult illustration generated once using the built-in image generator and visually inspected; transparent PNG, 1254 × 1254. Not a photograph of KODC clients. Animated using CSS, not presented as a GIF.
+
+Final generation prompt:
+
+> Use case: stylized-concept. Asset type: original square website illustration for KODC Dance & Fitness, suitable for subtle CSS animation. Primary request: exactly two adult dancers doing energetic dance-fitness / Zumba-style moves, full bodies visible, confident dynamic poses. Scene/backdrop: genuinely transparent background with alpha channel; no scenery or ground plane. Style/medium: polished original editorial flat illustration with clean expressive charcoal linework, bold flat color shapes, crisp silhouettes. Composition/framing: square canvas, two dancers as one balanced centered composition, all hands and feet visible with comfortable padding, no cropping. Color palette: clothing in bold gold #e2b735 and charcoal #202323 with white accents; natural skin tones. Mood: joyful, energetic, confident movement. Constraints: illustrated fictional adults, not real clients; exactly two people; anatomically coherent hands and limbs; no text, logo, watermark, props, scenery, or additional decorative background elements. Preserve genuine transparency rather than a white or checkerboard painted backdrop.
+
+The YouTube privacy-enhanced embed follows [YouTube's embed guidance](https://support.google.com/youtube/answer/171780) and [player parameter documentation](https://developers.google.com/youtube/player_parameters). It loads only after explicit Play activation and retains an external watch fallback. Availability and embed permissions are controlled by YouTube/video owner.

@@ -12,7 +12,7 @@
   async function digest(value){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return Array.from(new Uint8Array(bytes)).map(x=>x.toString(16).padStart(2,'0')).join('');}
   document.querySelector('#login-form').addEventListener('submit',async event=>{
     event.preventDefault();const form=new FormData(event.target);const error=document.querySelector('#login-error');
-    try {if(form.get('username')!=='admin'||await digest(form.get('password'))!==passwordHash){error.textContent='Username or password is incorrect.';return;}sessionStorage.setItem(authKey,String(Date.now()+4*60*60*1000));event.target.reset();await openEditor();}catch{error.textContent='The editor needs HTTPS or localhost, and browser storage enabled.';}
+    try {if(form.get('username')!=='admin'||await digest(form.get('password'))!==passwordHash){error.textContent='Username or password is incorrect.';return;}error.textContent='';sessionStorage.setItem(authKey,String(Date.now()+4*60*60*1000));event.target.reset();await openEditor();}catch{error.textContent='The editor needs HTTPS or localhost, and browser storage enabled.';}
   });
   async function openEditor(){
     document.querySelector('#login-screen').hidden=true;document.querySelector('#editor-screen').hidden=false;

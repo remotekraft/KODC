@@ -14,6 +14,14 @@ The repository was private when implementation started. GitHub Pages availabilit
 
 If you later change domain or repository name, update the canonical URL, Open Graph URL, JSON-LD URL, sitemap, and robots references.
 
+Use only `.github/workflows/pages.yml`. A duplicate generic static workflow that uploaded the repository root caused `/admin.html` and the homepage to return 404 while `/dist/admin.html` worked; that competing workflow has been removed. The correct admin URL is https://remotekraft.github.io/KODC/admin.html. Legacy `/dist/` links now redirect to the correct pages.
+
+## Video and motion
+
+The performance section loads the requested YouTube video only after clicking Play, using YouTube's privacy-enhanced embed. Playback remains subject to YouTube availability and the video's embedding permissions; an external watch link is always available. No video file is downloaded or hosted here.
+
+Motion includes staggered entrances, scroll reveals, class-filter transitions, hover effects, a scroll progress bar, an animated dance illustration, and a CC0 dancing GIF. The footer's Pause animations control persists in this browser and hides the GIF (GIF frames cannot be paused with CSS). Reduced-motion preferences disable decorative motion and hide the GIF. Artwork credits and generation details are in `RESEARCH.md`.
+
 ## Admin editor
 
 Open `admin.html`. Initial convenience-login details were supplied privately in the handoff, not in this README. The password digest is in `dist/admin.js`. You can change the username and SHA-256 digest there.
