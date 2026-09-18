@@ -6,7 +6,7 @@ const context = {window:{},URL,localStorage:{getItem:k=>store.get(k)||null,setIt
 vm.createContext(context);
 vm.runInContext(readFileSync('dist/content.js','utf8'),context);
 const content = JSON.parse(readFileSync('dist/content.json','utf8'));
-const k = context.window.KODC;
+const k = context.KODC;
 assert.equal(k.validate(content).classes.length,5);
 assert.equal(k.safeUrl('javascript:alert(1)'), '');
 assert.equal(k.safeUrl('https://user:password@example.com/'), '');

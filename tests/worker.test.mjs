@@ -1,0 +1,57 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import worker from '../worker/index.mjs';
+const origin='https://kodc.remotekraft.workers.dev';
+const content=JSON.parse(readFileSync('dist/content.json','utf8'));
+const sha='a'.repeat(40),nextSha='b'.repeat(40);
+let limited=false,githubStatus=200,calls=[];
+const env={SITE_ORIGIN:origin,ADMIN_USERNAME:'admin',ADMIN_PASSWORD:'test-only-password-not-real',SESSION_SECRET:'test-only-session-key-not-a-real-secret-123',GITHUB_TOKEN:'test-only-github-token',AUTH_LIMITER:{limit:async()=>({success:!limited})},ASSETS:{fetch:async()=>new Response('static asset')}};
+const originalFetch=globalThis.fetch;
+globalThis.fetch=async(url,options)=>{
+  calls.push({url,options});
+  assert.ok(String(url).startsWith('https://api.github.com/repos/remotekraft/KODC/contents/dist/content.json'));
+  if(githubStatus!==200)return new Response('{}',{status:githubStatus});
+  if(options.method==='PUT')return Response.json({content:{sha:nextSha},commit:{sha:'c'.repeat(40)}});
+  return Response.json({sha,encoding:'base64',content:Buffer.from(JSON.stringify(content)).toString('base64')});
+};
+const request=(path,body,extra={})=>new Request(origin+'/api/'+path,{method:body===undefined?'GET':'POST',headers:{...(body===undefined?{}:{Origin:origin,'Content-Type':'application/json'}),...extra},...(body===undefined?{}:{body:JSON.stringify(body)})});
+const send=(path,body,headers,bindings=env)=>worker.fetch(request(path,body,headers),bindings);
+try{
+  let response=await send('session',undefined,{},{});assert.equal(response.status,503);assert.equal((await response.json()).configured,false);
+  response=await worker.fetch(new Request(origin+'/styles.css'),env);assert.equal(await response.text(),'static asset');
+  response=await send('session');assert.equal(response.headers.get('Cache-Control'),'no-store');assert.equal((await response.json()).authenticated,false);
+  response=await send('content');assert.equal(response.status,401);assert.equal(calls.length,0);
+  response=await send('publish',{sha,content});assert.equal(response.status,401);
+  response=await send('login',{username:'admin',password:env.ADMIN_PASSWORD},{Origin:'https://evil.example'});assert.equal(response.status,403);
+  response=await worker.fetch(new Request('https://preview.example/api/session'),env);assert.equal(response.status,403);
+  response=await send('session',{});assert.equal(response.status,405);
+  response=await send('login',{username:'admin',password:'wrong'});assert.equal(response.status,401);
+  limited=true;response=await send('login',{username:'admin',password:env.ADMIN_PASSWORD});assert.equal(response.status,429);limited=false;
+  response=await send('login',{username:'admin',password:env.ADMIN_PASSWORD});assert.equal(response.status,200);
+  const cookie=response.headers.get('Set-Cookie');assert.ok(cookie.includes('HttpOnly; Secure; SameSite=Strict'));assert.ok(cookie.startsWith('__Host-kodc_session='));
+  const token=cookie.split(';')[0],{csrf}=await response.json();
+  response=await send('session',undefined,{Cookie:token});assert.equal((await response.json()).authenticated,true);
+  response=await send('session',undefined,{Cookie:token+'x'});assert.equal((await response.json()).authenticated,false);
+  // A correctly signed but expired cookie must also be rejected.
+  const expired=Buffer.from(JSON.stringify({v:1,user:'admin',exp:Math.floor(Date.now()/1000)-1,csrf})).toString('base64url');
+  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(env.SESSION_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const signature=Buffer.from(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(expired))).toString('base64url');
+  response=await send('session',undefined,{Cookie:'__Host-kodc_session='+expired+'.'+signature});assert.equal((await response.json()).authenticated,false);
+  response=await send('publish',{sha,content},{Cookie:token});assert.equal(response.status,403);assert.equal(calls.length,0);
+  response=await send('content',undefined,{Cookie:token});const remote=await response.json();assert.equal(remote.sha,sha);assert.deepEqual(remote.content,content);
+  const headers={Cookie:token,'X-CSRF-Token':csrf};
+  response=await send('publish',{sha:'invalid',content},headers);assert.equal(response.status,400);
+  const bad=structuredClone(content);bad.instructors[0].photo='javascript:alert(1)';response=await send('publish',{sha,content:bad},headers);assert.equal(response.status,400);assert.equal(calls.length,1);
+  response=await send('publish',{sha,content}, {...headers,'Content-Type':'text/plain'});assert.equal(response.status,415);
+  response=await send('publish',{sha,content:'x'.repeat(1024*1024+1)},headers);assert.equal(response.status,413);
+  limited=true;response=await send('publish',{sha,content},headers);assert.equal(response.status,429);limited=false;
+  const changed=structuredClone(content);changed.classes[0].schedule='Mon · 6–7 PM';
+  response=await send('publish',{sha,content:changed,repository:'evil/other',path:'.github/workflows/evil.yml'},headers);assert.equal(response.status,200);assert.equal((await response.json()).sha,nextSha);
+  const commit=JSON.parse(calls.at(-1).options.body);assert.equal(commit.branch,'main');assert.equal(commit.sha,sha);assert.deepEqual(JSON.parse(Buffer.from(commit.content,'base64').toString()),changed);
+  githubStatus=409;response=await send('publish',{sha,content},headers);assert.equal(response.status,409);
+  githubStatus=403;response=await send('publish',{sha,content},headers);assert.equal(response.status,502);const error=await response.text();assert.ok(!error.includes(env.GITHUB_TOKEN));assert.ok(!error.includes(env.ADMIN_PASSWORD));
+  response=await send('logout',{},headers);assert.equal(response.status,200);assert.ok(response.headers.get('Set-Cookie').includes('Max-Age=0'));
+  assert.ok(!readFileSync('dist/admin.js','utf8').includes('passwordHash'));
+  assert.ok(!readFileSync('dist/admin.js','utf8').includes('KODC@Gold2026!'));
+  console.log('Worker tests passed: configuration, auth, cookies, expiry, origin, CSRF, rate limits, validation, body limits, fixed GitHub target, publishing, conflicts, failures, and logout. No real GitHub writes performed.');
+}finally{globalThis.fetch=originalFetch;}

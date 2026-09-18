@@ -1,0 +1,19 @@
+{
+  "name": "kodc",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-09-18",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "SITE_ORIGIN": "https://kodc.remotekraft.workers.dev",
+    "ADMIN_USERNAME": "admin"
+  },
+  "ratelimits": [{
+    "name": "AUTH_LIMITER",
+    "namespace_id": "740031",
+    "simple": {"limit": 5, "period": 60}
+  }]
+}

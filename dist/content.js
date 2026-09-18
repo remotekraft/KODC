@@ -1,5 +1,5 @@
 /* Static published content is authoritative; localStorage contains editor drafts only. */
-window.KODC = (() => {
+globalThis.KODC = (() => {
   'use strict';
   const draftKey = 'kodc-content-draft-v1';
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

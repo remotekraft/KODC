@@ -1,10 +1,14 @@
 # KODC Dance & Fitness
 
-Responsive, buildless HTML/CSS/JavaScript showcase with a browser-local studio editor. No framework, database, booking form, analytics, or server required.
+Responsive HTML/CSS/JavaScript showcase with a Cloudflare Worker-backed secure studio editor. No framework, database, booking form, or analytics. Public pages are static; authenticated publishing uses the Worker.
 
 ## Run locally
 
-From this repository: `python -m http.server 4173 --directory dist`, then open `http://localhost:4173/`. Use HTTP/HTTPS, not a file:// URL, because published content is loaded from JSON.
+For public-page previews: `python -m http.server 4173 --directory dist`, then open `http://localhost:4173/`. Use HTTP/HTTPS, not a file:// URL, because published content is loaded from JSON. Secure admin publishing requires the configured production Cloudflare Worker; it deliberately does not fall back to a frontend password gate on static previews.
+
+## Cloudflare hosting and secure publishing
+
+The production Worker is https://kodc.remotekraft.workers.dev. Existing build settings (`main`, repository root, `npx wrangler deploy`) are supported by `wrangler.jsonc`. **Follow [CLOUDFLARE-SETUP.md](CLOUDFLARE-SETUP.md) to add runtime secrets and activate publishing.** Until configured, the public website continues working and admin fails closed with a setup message. GitHub credentials and admin passwords are never put in frontend assets.
 
 ## GitHub Pages
 
@@ -24,9 +28,9 @@ Motion includes staggered entrances, scroll reveals, class-filter transitions, h
 
 ## Admin editor
 
-Open `admin.html`. Initial convenience-login details were supplied privately in the handoff, not in this README. The password digest is in `dist/admin.js`. You can change the username and SHA-256 digest there.
+Open `admin.html` on the configured Cloudflare origin. Username defaults to `admin`; the owner sets a NEW password as the encrypted `ADMIN_PASSWORD` runtime secret. The old client-side password/digest and sessionStorage login gate have been removed.
 
-**This is not secure authentication.** All frontend code is inspectable and the gate can be bypassed. It offers no protection for sensitive information and no authority to write to GitHub. The editor is for public showcase content only. A real secure admin/publish system requires an authenticated server or an authorized GitHub integration, even if no database is used.
+The Worker checks credentials server-side, issues a signed expiring HttpOnly cookie, checks exact request origin and CSRF tokens, rate-limits login/publishing, validates content, and only writes `dist/content.json` to `remotekraft/KODC` on `main`. The editor is for public showcase content only, never sensitive student/payment data. A static GitHub Pages copy cannot authenticate or publish.
 
 The editor manages classes, days/timings, instructor assignments, featured/publish status, instructor biographies/photos, testimonials, and contact/social/review-snapshot details. Instructor images may be approved HTTPS URLs or committed `assets/` paths. No file-upload storage service is included.
 
@@ -34,11 +38,11 @@ The editor manages classes, days/timings, instructor assignments, featured/publi
 
 1. Save the local draft in the admin editor.
 2. Use **Preview local draft** to see it in this browser. The preview is visibly labelled and noindexed.
-3. Click **Export content.json**. Unsaved form fields are not included.
-4. Replace `dist/content.json` in the repository with that export and commit to `main`.
-5. The Pages workflow deploys it. Every visitor then sees the published JSON.
+3. Click **Publish website** and confirm. Unsaved form fields must be saved or cancelled first.
+4. The Worker commits the complete saved content file to GitHub automatically. No manual commit needed.
+5. Cloudflare builds and deploys the commit. Every visitor sees it only after that deployment succeeds. GitHub Pages may also deploy the static public copy.
 
-Ordinary visitors **never read your local draft**. Drafts do not sync between devices or browsers; export backups before clearing storage. Import validates a complete KODC JSON file and asks before replacing a draft. Published content is the authoritative source; localStorage is only temporary editor state. The optional WebMCP tool reads a loaded draft; it does not publish.
+Ordinary visitors **never read your local draft**. Drafts do not sync between devices or browsers; export backups before clearing storage. Import validates a complete KODC JSON file and asks before replacing a draft. Repository revisions prevent stale drafts silently overwriting newer commits. Published content is the authoritative source; localStorage is only temporary editor state. Export remains available as a backup/manual recovery path. See the setup guide for legacy-draft migration and conflict recovery. The optional WebMCP tool reads a loaded draft; it does not publish.
 
 Call and WhatsApp buttons initiate an enquiry, not a confirmed booking. No booking data is saved by this website. Google reviews and counts are a dated static snapshot, not an API/live feed. Google Fonts is an external stylesheet; local fallback fonts work if unavailable.
 
@@ -54,4 +58,4 @@ See `RESEARCH.md` for source links and uncertainty notes.
 
 ## Checks
 
-Run `node --check dist/content.js`, `node --check dist/app.js`, `node --check dist/admin.js`, and `node tests/content.test.cjs`. The Pages workflow runs these before deployment. Motion respects `prefers-reduced-motion`; navigation, filters, dialogs, and the editor support keyboards and touch.
+Run `node --check dist/content.js`, `node --check dist/app.js`, `node --check dist/admin.js`, `node --check worker/index.mjs`, `node tests/content.test.cjs`, and `node tests/worker.test.mjs`. The Pages workflow runs these before deployment. Worker tests use mocked GitHub responses and never publish real content. Motion respects `prefers-reduced-motion`; navigation, filters, dialogs, and the editor support keyboards and touch.
