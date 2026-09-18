@@ -17,7 +17,7 @@ globalThis.fetch=async(url,options)=>{
 const request=(path,body,extra={})=>new Request(origin+'/api/'+path,{method:body===undefined?'GET':'POST',headers:{...(body===undefined?{}:{Origin:origin,'Content-Type':'application/json'}),...extra},...(body===undefined?{}:{body:JSON.stringify(body)})});
 const send=(path,body,headers,bindings=env)=>worker.fetch(request(path,body,headers),bindings);
 try{
-  let response=await send('session',undefined,{},{});assert.equal(response.status,503);assert.equal((await response.json()).configured,false);
+  let response=await send('session',undefined,{},{});assert.equal(response.status,503);const setup=await response.json();assert.equal(setup.configured,false);assert.ok(!/GitHub|Cloudflare|Worker|secrets|JSON|commit|repository/i.test(setup.error),'Setup message must be plain language');
   response=await worker.fetch(new Request(origin+'/styles.css'),env);assert.equal(await response.text(),'static asset');
   response=await send('session');assert.equal(response.headers.get('Cache-Control'),'no-store');assert.equal((await response.json()).authenticated,false);
   response=await send('content');assert.equal(response.status,401);assert.equal(calls.length,0);
@@ -46,7 +46,7 @@ try{
   response=await send('publish',{sha,content:'x'.repeat(1024*1024+1)},headers);assert.equal(response.status,413);
   limited=true;response=await send('publish',{sha,content},headers);assert.equal(response.status,429);limited=false;
   const changed=structuredClone(content);changed.classes[0].schedule='Mon · 6–7 PM';
-  response=await send('publish',{sha,content:changed,repository:'evil/other',path:'.github/workflows/evil.yml'},headers);assert.equal(response.status,200);assert.equal((await response.json()).sha,nextSha);
+  response=await send('publish',{sha,content:changed,repository:'evil/other',path:'.github/workflows/evil.yml'},headers);assert.equal(response.status,200);const sent=await response.json();assert.equal(sent.sha,nextSha);assert.ok(!/GitHub|Cloudflare|Worker|commit|deploy/i.test(sent.message),'Success message must be plain language');
   const commit=JSON.parse(calls.at(-1).options.body);assert.equal(commit.branch,'main');assert.equal(commit.sha,sha);assert.deepEqual(JSON.parse(Buffer.from(commit.content,'base64').toString()),changed);
   githubStatus=409;response=await send('publish',{sha,content},headers);assert.equal(response.status,409);
   githubStatus=403;response=await send('publish',{sha,content},headers);assert.equal(response.status,502);const error=await response.text();assert.ok(!error.includes(env.GITHUB_TOKEN));assert.ok(!error.includes(env.ADMIN_PASSWORD));

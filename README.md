@@ -37,8 +37,8 @@ The editor manages classes, days/timings, instructor assignments, featured/publi
 ### Publish an edit
 
 1. Save the local draft in the admin editor.
-2. Use **Preview local draft** to see it in this browser. The preview is visibly labelled and noindexed.
-3. Click **Publish website** and confirm. Unsaved form fields must be saved or cancelled first.
+2. Use **Preview changes** to see it in this browser. The preview is visibly labelled and noindexed.
+3. Click **Update website** and confirm. Unsaved form fields must be saved or cancelled first.
 4. The Worker commits the complete saved content file to GitHub automatically. No manual commit needed.
 5. Cloudflare builds and deploys the commit. Every visitor sees it only after that deployment succeeds. GitHub Pages may also deploy the static public copy.
 

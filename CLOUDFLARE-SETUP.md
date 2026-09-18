@@ -56,12 +56,12 @@ Open **https://kodc.remotekraft.workers.dev/admin.html**:
 
 1. Log in with `admin` and YOUR new `ADMIN_PASSWORD`.
 2. Edit classes, timings, instructors, reviews, or contact details.
-3. **Save draft** → optionally **Preview local draft** → **Publish website** → confirm.
+3. **Save changes** → optionally **Preview changes** → **Update website** → confirm.
 4. A success message means GitHub accepted the content commit. Check Cloudflare's deployment status; visitors receive it after deployment succeeds. Publication is not instantaneous, and the editor does not claim a deployment has completed.
 
-Draft save does not immediately publish, so unfinished changes never appear accidentally. Publish includes the entire saved draft, not unsaved form fields. You no longer need to export or commit manually; **Export backup** remains available as a safeguard.
+Draft save does not immediately publish, so unfinished changes never appear accidentally. Publish includes the entire saved draft, not unsaved form fields. You no longer need to export or commit manually; **Download backup** remains available as a safeguard.
 
-Old browser drafts have no publishing revision. Export one as a backup, click **Reload latest content**, then import the backup if desired, review the complete draft, save, and publish. If another editor publishes after your draft's baseline, GitHub rejects your stale revision. Export a backup, reload latest content, and manually reapply your edits; do not simply import an old complete file over somebody else's edits without reviewing it.
+Old browser drafts have no publishing revision. Export one as a backup, click **Get latest changes**, then restore the backup if desired, review the complete draft, save, and publish. If another editor publishes after your draft's baseline, GitHub rejects your stale revision. Export a backup, reload latest content, and manually reapply your edits; do not simply import an old complete file over somebody else's edits without reviewing it.
 
 ## Security and limitations
 

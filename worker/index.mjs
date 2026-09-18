@@ -40,21 +40,21 @@ async function issueSession(env){
   return {csrf,cookie:`${COOKIE}=${payload}.${signature}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${TTL}`};
 }
 async function readJson(request){
-  if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json'))fail(415,'JSON content is required.');
+  if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json'))fail(415,'We couldn’t read your changes. Please refresh the page and try again.');
   if(Number(request.headers.get('Content-Length'))>MAX_BODY)fail(413,'Content is too large. Maximum: 1 MB.');
-  const reader=request.body?.getReader();if(!reader)fail(400,'Missing request body.');
+  const reader=request.body?.getReader();if(!reader)fail(400,'No changes were received. Please try again.');
   const chunks=[];let length=0;
   while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>MAX_BODY){await reader.cancel();fail(413,'Content is too large. Maximum: 1 MB.');}chunks.push(value);}
   const bytes=new Uint8Array(length);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
-  try{return JSON.parse(new TextDecoder().decode(bytes));}catch{fail(400,'Invalid JSON.');}
+  try{return JSON.parse(new TextDecoder().decode(bytes));}catch{fail(400,'We couldn’t read your changes. Please try again.');}
 }
 async function github(env,method='GET',body){
   const response=await fetch(REPOSITORY+(method==='GET'?'?ref=main':''),{
     method,headers:{Authorization:'Bearer '+env.GITHUB_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'KODC-publisher','Content-Type':'application/json'},
     ...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(15000)
   });
-  if(response.status===409 || response.status===422)fail(409,'Content changed on GitHub, or the commit was rejected. Export a backup, reload the latest content, and reapply your changes.');
-  if(!response.ok)fail(502,'GitHub could not complete publishing. Check the token permissions, expiry, repository rules, and Cloudflare deployment settings.');
+  if(response.status===409 || response.status===422)fail(409,'Your changes couldn’t be accepted. Someone may have updated the website. Download a backup, choose Get latest changes, and add your edits again. If this keeps happening, ask your website manager for help.');
+  if(!response.ok)fail(502,'We couldn’t update the website. Your saved changes are kept. Please try again later or ask your website manager for help.');
   return response.json();
 }
 export default {
@@ -62,12 +62,12 @@ export default {
     const url=new URL(request.url);
     if(!url.pathname.startsWith('/api/'))return env.ASSETS.fetch(request);
     try {
-      if(!['/api/session','/api/login','/api/logout','/api/content','/api/publish'].includes(url.pathname))fail(404,'Unknown API route.');
+      if(!['/api/session','/api/login','/api/logout','/api/content','/api/publish'].includes(url.pathname))fail(404,'This action isn’t available.');
       const method=url.pathname==='/api/session'||url.pathname==='/api/content'?'GET':'POST';
-      if(request.method!==method)return json({error:'Method not allowed.'},405,{Allow:method});
-      if(!ready(env))return json({configured:false,authenticated:false,error:'Publishing is not configured. Add the Worker runtime secrets listed in CLOUDFLARE-SETUP.md.'},503);
-      if(url.origin!==env.SITE_ORIGIN || url.protocol!=='https:')fail(403,'Use the configured production website to manage content.');
-      if(method==='POST' && request.headers.get('Origin')!==env.SITE_ORIGIN)fail(403,'Request origin rejected.');
+      if(request.method!==method)return json({error:'This action isn’t available.'},405,{Allow:method});
+      if(!ready(env))return json({configured:false,authenticated:false,error:'Website updates aren’t ready yet. Please ask your website manager to finish setting up this page.'},503);
+      if(url.origin!==env.SITE_ORIGIN || url.protocol!=='https:')fail(403,'Please use the admin page on your main website.');
+      if(method==='POST' && request.headers.get('Origin')!==env.SITE_ORIGIN)fail(403,'Please refresh the admin page on your main website and try again.');
       const current=await session(request,env);
       if(url.pathname==='/api/session')return json({configured:true,authenticated:Boolean(current),...(current?{csrf:current.csrf}:{})});
       if(url.pathname==='/api/logout')return json({ok:true},200,{'Set-Cookie':`${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`});
@@ -79,20 +79,20 @@ export default {
         if(!correct || body?.username!==(env.ADMIN_USERNAME||'admin'))fail(401,'Username or password is incorrect.');
         const token=await issueSession(env);return json({authenticated:true,csrf:token.csrf},200,{'Set-Cookie':token.cookie});
       }
-      if(!current)fail(401,'Your session expired. Log in again; your local draft is kept.');
+      if(!current)fail(401,'Please log in again. Your saved changes are kept.');
       if(url.pathname==='/api/content'){
         const file=await github(env);
-        if(file.encoding!=='base64' || !file.content || !/^[a-f0-9]{40}$/.test(file.sha))fail(502,'GitHub returned an unsupported content file.');
-        let content;try{content=validate(JSON.parse(new TextDecoder().decode(unb64(file.content.replace(/\s/g,'')))));}catch{fail(502,'The repository content is invalid. Check dist/content.json.');}
+        if(file.encoding!=='base64' || !file.content || !/^[a-f0-9]{40}$/.test(file.sha))fail(502,'We couldn’t load your website details. Please ask your website manager for help.');
+        let content;try{content=validate(JSON.parse(new TextDecoder().decode(unb64(file.content.replace(/\s/g,'')))));}catch{fail(502,'We couldn’t read your website details. Please ask your website manager for help.');}
         return json({content,sha:file.sha});
       }
-      if(request.headers.get('X-CSRF-Token')!==current.csrf)fail(403,'Publishing verification failed. Refresh and log in again.');
-      const limited=await env.AUTH_LIMITER.limit({key:'publish:'+current.user});if(!limited.success)fail(429,'Too many publish requests. Wait a minute.');
+      if(request.headers.get('X-CSRF-Token')!==current.csrf)fail(403,'Please refresh the page and log in again before updating your website.');
+      const limited=await env.AUTH_LIMITER.limit({key:'publish:'+current.user});if(!limited.success)fail(429,'Please wait a minute before updating again.');
       const body=await readJson(request);
-      if(!/^[a-f0-9]{40}$/.test(body?.sha||''))fail(400,'Reload the latest content before publishing.');
-      let clean;try{clean=validate(body.content);}catch(error){fail(400,'Content rejected: '+error.message);}
+      if(!/^[a-f0-9]{40}$/.test(body?.sha||''))fail(400,'Choose Get latest changes before updating your website.');
+      let clean;try{clean=validate(body.content);}catch(error){fail(400,'Please review your entries and try again. Check that names, timings, links, and ratings are filled in correctly.');}
       const result=await github(env,'PUT',{branch:'main',sha:body.sha,message:'Publish KODC showcase from secure admin',content:b64(encoder.encode(JSON.stringify(clean,null,2)+'\n'))});
-      return json({ok:true,sha:result.content.sha,commit:result.commit.sha,message:'Saved to GitHub. Cloudflare will now build and deploy the update; visitors see it after deployment completes.'});
-    }catch(error){return json({error:error.status?error.message:'The publishing service is temporarily unavailable. Your local draft is safe; try again later.'},error.status||502);}
+      return json({ok:true,sha:result.content.sha,commit:result.commit.sha,message:'Your changes have been sent to the website. Please allow a few minutes, then check your website to see the update.'});
+    }catch(error){return json({error:error.status?error.message:'Website updates are temporarily unavailable. Your saved changes are safe; please try again later.'},error.status||502);}
   }
 };

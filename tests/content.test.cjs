@@ -39,4 +39,7 @@ assert.ok(readFileSync('.github/workflows/pages.yml','utf8').includes('path: dis
 assert.ok(!existsSync('.github/workflows/static.yml'),'Duplicate Pages workflow would overwrite the site');
 assert.ok(existsSync('dist/assets/whatsapp.svg'),'Missing WhatsApp icon');
 assert.ok(readFileSync('dist/styles.css','utf8').includes('a[href^="https://wa.me/"]:before'),'All WhatsApp links must receive the icon, including dynamically rendered classes');
+const adminText=readFileSync('dist/admin.html','utf8').replace(/<[^>]*>/g,'');
+assert.ok(!/GitHub|Cloudflare|Worker|repository|database|deployment|export|import/i.test(adminText),'Visible admin text must use plain language');
+assert.ok(adminText.includes('Update website') && adminText.includes('Download backup') && adminText.includes('Restore backup'));
 console.log('Content validation, URL safety, escaping, draft persistence, and failure checks passed.');
