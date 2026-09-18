@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /KODC/
+Disallow: /KODC/admin.html
+Sitemap: https://remotekraft.github.io/KODC/sitemap.xml
