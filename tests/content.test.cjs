@@ -32,6 +32,7 @@ for (const entry of ['index.html','admin.html']) {
     assert.ok(existsSync('dist/'+path),'Missing asset: '+path);
   }
   assert.ok(html.includes('assets/logo.jpeg'),'Missing logo/favicon');
+  assert.ok(html.includes('rel="icon" type="image/jpeg" href="assets/favicon.jpeg"'),'Missing updated favicon');
 }
 JSON.parse(readFileSync('dist/index.html','utf8').match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1]);
 assert.ok(readFileSync('.github/workflows/pages.yml','utf8').includes('path: dist'),'Pages must publish dist, not the repository root');
