@@ -13,17 +13,96 @@
     "reviewDate": "18 Sep 2026"
   },
   "classes": [
-    {"id":"zumba","name":"Zumba","category":"Fitness","description":"Big beats, upbeat movement and a feel-good workout. Turn your fitness time into your favourite time.","audience":"All experience levels","schedule":"Contact the studio for current batches","instructorId":"","fee":"Ask for current fees","featured":true,"published":true},
-    {"id":"bollywood","name":"Bollywood Dance","category":"Dance","description":"Bring your favourite songs to life. Explore expressive choreography, musicality and the joy of dancing.","audience":"Beginners welcome","schedule":"Contact the studio for current batches","instructorId":"","fee":"Ask for current fees","featured":false,"published":true},
-    {"id":"yoga","name":"Yoga","category":"Fitness","description":"Slow down and reconnect. Make space for movement, balance and a calmer moment in your day.","audience":"Ask about a suitable level","schedule":"Contact the studio for current batches","instructorId":"","fee":"Ask for current fees","featured":false,"published":true},
-    {"id":"hiphop","name":"Hip-Hop","category":"Dance","description":"Find your groove through rhythm and movement. Build your confidence one combination at a time.","audience":"Ask about current levels","schedule":"Contact the studio for current batches","instructorId":"","fee":"Ask for current fees","featured":false,"published":true},
-    {"id":"kids","name":"Kids Dance","category":"Kids","description":"A playful space for little movers. Let creativity, expression and confidence grow through dance.","audience":"Ask about age-specific groups","schedule":"Contact the studio for current batches","instructorId":"","fee":"Ask for current fees","featured":false,"published":true}
+    {
+      "id": "zumba",
+      "name": "Zumba",
+      "category": "Fitness",
+      "description": "Big beats, upbeat movement and a feel-good workout. Turn your fitness time into your favourite time.",
+      "audience": "All experience levels",
+      "schedule": "Mon & Sun· 6:00–7:00 PM",
+      "instructorId": "",
+      "fee": "Ask for current fees",
+      "featured": true,
+      "published": true
+    },
+    {
+      "id": "bollywood",
+      "name": "Bollywood Dance",
+      "category": "Dance",
+      "description": "Bring your favourite songs to life. Explore expressive choreography, musicality and the joy of dancing.",
+      "audience": "Beginners welcome",
+      "schedule": "Contact the studio for current batches",
+      "instructorId": "",
+      "fee": "Ask for current fees",
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "yoga",
+      "name": "Yoga",
+      "category": "Fitness",
+      "description": "Slow down and reconnect. Make space for movement, balance and a calmer moment in your day.",
+      "audience": "Ask about a suitable level",
+      "schedule": "Contact the studio for current batches",
+      "instructorId": "",
+      "fee": "Ask for current fees",
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "hiphop",
+      "name": "Hip-Hop",
+      "category": "Dance",
+      "description": "Find your groove through rhythm and movement. Build your confidence one combination at a time.",
+      "audience": "Ask about current levels",
+      "schedule": "Contact the studio for current batches",
+      "instructorId": "",
+      "fee": "Ask for current fees",
+      "featured": false,
+      "published": true
+    },
+    {
+      "id": "kids",
+      "name": "Kids Dance",
+      "category": "Kids",
+      "description": "A playful space for little movers. Let creativity, expression and confidence grow through dance.",
+      "audience": "Ask about age-specific groups",
+      "schedule": "Contact the studio for current batches",
+      "instructorId": "",
+      "fee": "Ask for current fees",
+      "featured": false,
+      "published": true
+    }
   ],
   "instructors": [
-    {"id":"khushboo","name":"Khushboo Bengani","role":"Zumba instructor · public profile","bio":"Her public LinkedIn profile lists an association with KODC Dance & Fitness Centre and a Zumba Instructor certification issued in February 2022. Contact the studio for current teaching assignments.","photo":"","source":"https://in.linkedin.com/in/khushboo-bengani-a002b8bb","published":true}
+    {
+      "id": "khushboo",
+      "name": "Khushboo Bengani",
+      "role": "Zumba instructor · public profile",
+      "bio": "Her public LinkedIn profile lists an association with KODC Dance & Fitness Centre and a Zumba Instructor certification issued in February 2022. Contact the studio for current teaching assignments.",
+      "photo": "",
+      "source": "https://in.linkedin.com/in/khushboo-bengani-a002b8bb",
+      "published": true
+    }
   ],
   "testimonials": [
-    {"id":"review-rachna","name":"Rachna Ganatra","quote":"Great music, great vibes, and it honestly feels like home.","rating":5,"source":"https://www.google.com/maps/reviews/data=!4m5!14m4!1m3!1m2!1s106353471982178676247!2s0x3a0271dcad7c3f19:0xd686706ecda6cf48","platform":"Google review excerpt","published":true},
-    {"id":"review-ashwani","name":"ashwani kumar","quote":"Best place for zumba and good atmosphere with trained instructors.","rating":5,"source":"https://www.google.com/maps/reviews/data=!4m5!14m4!1m3!1m2!1s106034155054943389386!2s0x3a0271dcad7c3f19:0xd686706ecda6cf48","platform":"Google review excerpt","published":true}
+    {
+      "id": "review-rachna",
+      "name": "Rachna Ganatra",
+      "quote": "Great music, great vibes, and it honestly feels like home.",
+      "rating": 5,
+      "source": "https://www.google.com/maps/reviews/data=!4m5!14m4!1m3!1m2!1s106353471982178676247!2s0x3a0271dcad7c3f19:0xd686706ecda6cf48",
+      "platform": "Google review excerpt",
+      "published": true
+    },
+    {
+      "id": "review-ashwani",
+      "name": "ashwani kumar",
+      "quote": "Best place for zumba and good atmosphere with trained instructors.",
+      "rating": 5,
+      "source": "https://www.google.com/maps/reviews/data=!4m5!14m4!1m3!1m2!1s106034155054943389386!2s0x3a0271dcad7c3f19:0xd686706ecda6cf48",
+      "platform": "Google review excerpt",
+      "published": true
+    }
   ]
 }
