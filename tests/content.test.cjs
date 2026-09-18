@@ -36,4 +36,6 @@ for (const entry of ['index.html','admin.html']) {
 JSON.parse(readFileSync('dist/index.html','utf8').match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1]);
 assert.ok(readFileSync('.github/workflows/pages.yml','utf8').includes('path: dist'),'Pages must publish dist, not the repository root');
 assert.ok(!existsSync('.github/workflows/static.yml'),'Duplicate Pages workflow would overwrite the site');
+assert.ok(existsSync('dist/assets/whatsapp.svg'),'Missing WhatsApp icon');
+assert.ok(readFileSync('dist/styles.css','utf8').includes('a[href^="https://wa.me/"]:before'),'All WhatsApp links must receive the icon, including dynamically rendered classes');
 console.log('Content validation, URL safety, escaping, draft persistence, and failure checks passed.');
